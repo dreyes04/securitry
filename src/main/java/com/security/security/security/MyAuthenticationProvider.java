@@ -33,7 +33,10 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
         final var encodedPassword = customer.getPassword();
 
         if (passwordEncoder.matches(password, encodedPassword)) {
-            final var authorities = Collections.singletonList(new SimpleGrantedAuthority(customer.getRol()));
+            final var roles = customer.getRoles();
+            final var authorities = roles.stream()
+                    .map(role -> new SimpleGrantedAuthority(role.getName()))
+                    .collect(Collectors.toList());
             return new UsernamePasswordAuthenticationToken(userName, password, authorities);
         } else {
             return new UsernamePasswordAuthenticationToken(userName, password, null);

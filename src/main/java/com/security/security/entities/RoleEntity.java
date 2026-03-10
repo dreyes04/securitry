@@ -7,18 +7,16 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
-@Table(name = "customers")
+@Table(name = "roles")
 @Data
-public class CustomerEntity implements Serializable {
+public class RoleEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String email;
-    @Column(name = "pwd")
-    private  String password;
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_customer")
-    private List<RoleEntity> roles;
+    @Column(name = "role_name")
+    private String name;
+    private String description;
+
 }

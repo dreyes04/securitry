@@ -28,18 +28,26 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
     public @Nullable Authentication authenticate(Authentication authentication) throws AuthenticationException {
         final var userName = authentication.getName();
         final var password = authentication.getCredentials().toString();
+        System.out.println("MyAuthenticationProvider.authenticate - username recibido: " + userName);
+        System.out.println("MyAuthenticationProvider.authenticate - password recibido: " + password);
         final var customerBd = customerRepository.findByEmail(userName);
-        final var customer = customerBd.orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+        final var customer = customerBd.orElseThrow(() -> {
+            System.out.println("MyAuthenticationProvider.authenticate - no se encontró usuario en BD");
+            return new BadCredentialsException("Invalid credentials");
+        });
         final var encodedPassword = customer.getPassword();
+        System.out.println("MyAuthenticationProvider.authenticate - password en BD: " + encodedPassword);
 
         if (passwordEncoder.matches(password, encodedPassword)) {
+            System.out.println("MyAuthenticationProvider.authenticate - passwords coinciden");
             final var roles = customer.getRoles();
             final var authorities = roles.stream()
                     .map(role -> new SimpleGrantedAuthority(role.getName()))
                     .collect(Collectors.toList());
             return new UsernamePasswordAuthenticationToken(userName, password, authorities);
         } else {
-            return new UsernamePasswordAuthenticationToken(userName, password, null);
+            System.out.println("MyAuthenticationProvider.authenticate - passwords NO coinciden");
+            throw new BadCredentialsException("Invalid credentials");
         }
 
     }
